@@ -1,21 +1,38 @@
 const socket = io();
-const username = "{{ username }}";
+
 const chatBox = document.getElementById("chat-box");
 const messageInput = document.getElementById("message");
-const sendBtn = document.getElementById("send-btn");
+const sendBtn = document.getElementById("send");
 
-sendBtn.onclick = () => {
-  const message = messageInput.value.trim();
-  if (!message) return;
-  socket.send(`${username}: ${message}`);
-  messageInput.value = "";
-};
+// Ensure OLD_MESSAGES is an array
+const msgs = Array.isArray(OLD_MESSAGES) ? OLD_MESSAGES : [];
 
-socket.on("message", msg => {
-  const msgDiv = document.createElement("div");
-  msgDiv.className = "msg";
-  const [name, ...text] = msg.split(":");
-  msgDiv.innerHTML = `<span class="username">${name}</span>: ${text.join(":")}`;
-  chatBox.appendChild(msgDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
+// Load old messages
+msgs.forEach(msg => {
+    const div = document.createElement("div");
+    div.textContent = `[${msg.time}] ${msg.user}: ${msg.text}`;
+    chatBox.appendChild(div);
+});
+chatBox.scrollTop = chatBox.scrollHeight;
+
+// Send message
+sendBtn.addEventListener("click", () => {
+    const text = messageInput.value.trim();
+    if (text !== "") {
+        socket.emit("send_message", { text: text });
+        messageInput.value = "";
+    }
+});
+
+// Receive live messages
+socket.on("receive_message", (data) => {
+    const newMsg = document.createElement("div");
+    newMsg.textContent = `[${data.time}] ${data.user}: ${data.text}`;
+    chatBox.appendChild(newMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+// Optional: Press Enter to send
+messageInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendBtn.click();
 });

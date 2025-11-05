@@ -1,28 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Quantom Chat</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    <meta charset="utf-8">
+    <title>Quantom Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="top-bar">
-      <h1>💬 Quantom Chat</h1>
-      <div class="user-info">
-        <p>Welcome, <b>{{ username }}</b></p>
+    <div class="chat-container">
+        <h2>Welcome, {{ username }}!</h2>
         <a href="{{ url_for('logout') }}">Logout</a>
-      </div>
+
+        <div id="chat-box"></div>
+
+        <div class="input-container">
+            <input id="message" type="text" placeholder="Type your message...">
+            <button id="send">Send</button>
+        </div>
     </div>
 
-    <div id="chat-box"></div>
-    <div class="input-area">
-      <input type="text" id="message" placeholder="Type your message..." autocomplete="off">
-      <button id="send-btn">Send</button>
-    </div>
-  </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script>
+        const USERNAME = "{{ username }}";
+        // Ensure OLD_MESSAGES is always an array
+        const OLD_MESSAGES = {{ messages|tojson | safe }} || [];
+    </script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>
